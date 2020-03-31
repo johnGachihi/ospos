@@ -1,0 +1,11 @@
+.idea
+vendor
+UPGRADE.txt
+WHATS_NEW.txt
+INSTALL.md
+docker*
+Dockerfile
+import_customers.csv
+public/bower_components
+public/images
+public/uploads
