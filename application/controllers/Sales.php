@@ -20,7 +20,6 @@ class Sales extends Secure_Controller
 
 	public function index()
 	{
-		echo 'ble ble ble ble ble';
 		$this->session->set_userdata('allow_temp_items', 1);
 		$this->_reload();
 	}
@@ -1052,7 +1051,6 @@ class Sales extends Secure_Controller
 		$sale_id = $this->session->userdata('sale_id');
 		if($sale_id == '')
 		{
-			$sale_id = -1;
 			$this->session->set_userdata('sale_id', -1);
 		}
 		$data['cart'] = $this->sale_lib->get_cart();
