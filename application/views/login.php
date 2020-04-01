@@ -2,6 +2,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    
+    <!--  CSRF  -->
+    <meta name="csrf-token" content="<?php echo $this->security->get_csrf_hash() ?>">
+    
 	<base href="<?php echo base_url();?>" />
 	<title><?php echo $this->config->item('company') . ' | OSPOS ' . $this->config->item('application_version')  . ' | ' .  $this->lang->line('login_login'); ?></title>
 	<link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico">

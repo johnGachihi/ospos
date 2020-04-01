@@ -257,7 +257,7 @@ $config['directory_trigger'] = 'd';
 | your log files will fill up very fast.
 |
 */
-$config['log_threshold'] = 0;
+$config['log_threshold'] = 1;
 
 /*
 |--------------------------------------------------------------------------
@@ -486,7 +486,7 @@ $config['csrf_protection'] = TRUE;
 $config['csrf_token_name'] = 'csrf_ospos_v3';
 $config['csrf_cookie_name'] = 'csrf_cookie_ospos_v3';
 $config['csrf_expire'] = 7200;
-$config['csrf_regenerate'] = TRUE;
+$config['csrf_regenerate'] = FALSE;
 $config['csrf_exclude_uris'] = array('login');
 
 /*

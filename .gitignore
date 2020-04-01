@@ -9,3 +9,5 @@ import_customers.csv
 public/bower_components
 public/images
 public/uploads
+node_modules
+cypress/integration/examples
