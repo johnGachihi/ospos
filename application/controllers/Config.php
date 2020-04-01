@@ -825,6 +825,25 @@ class Config extends Secure_Controller
 			'message' => $this->lang->line('config_saved_' . ($success ? '' : 'un') . 'successfully')
 		));
 	}
+
+	public function save_mpesa() {
+	    $input = [
+	        'mpesa_till_number' => $this->input->post('mpesa_till_number'),
+            'mpesa_test_phone_number' => $this->input->post('mpesa_test_phone_number')
+        ];
+
+	    $result = $this->Appconfig->batch_save($input);
+	    $success = $result ? TRUE : FALSE;
+
+	    if ($success) {
+	        // Register Mpesa c2b callback url
+        }
+
+	    echo json_encode([
+	        'success' => $success,
+            'message' => $this->lang->line('config_saved_' . ($success ? '' : 'un') . 'successfully')
+        ]);
+    }
 	
 	public function remove_logo()
 	{

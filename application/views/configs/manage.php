@@ -30,6 +30,9 @@
 		<a data-toggle="tab" href="#invoice_tab" title="<?php echo $this->lang->line('config_invoice_configuration'); ?>"><?php echo $this->lang->line('config_invoice'); ?></a>
 	</li>
 	<li role="presentation">
+		<a data-toggle="tab" href="#mpesa_tab" title="<?php echo $this->lang->line('config_mpesa_configuration'); ?>"><?php echo $this->lang->line('config_mpesa'); ?></a>
+	</li>
+	<li role="presentation">
 		<a data-toggle="tab" href="#email_tab" title="<?php echo $this->lang->line('config_email_configuration'); ?>"><?php echo $this->lang->line('config_email'); ?></a>
 	</li>
 	<li role="presentation">
@@ -76,6 +79,9 @@
 	</div>
 	<div class="tab-pane" id="invoice_tab">
 		<?php $this->load->view("configs/invoice_config"); ?>
+	</div>
+	<div class="tab-pane" id="mpesa_tab">
+		<?php $this->load->view("configs/mpesa_config"); ?>
 	</div>
 	<div class="tab-pane" id="email_tab">
 		<?php $this->load->view("configs/email_config"); ?>
