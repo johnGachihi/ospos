@@ -11,3 +11,5 @@ public/images
 public/uploads
 node_modules
 cypress/integration/examples
+application/tests/build
+application/tests/.phpunit.result.cache
