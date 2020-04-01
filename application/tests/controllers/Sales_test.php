@@ -9,15 +9,27 @@ class Sales_test extends TestCase
         $this->resetInstance();
     }
 
-    public function test_index()
+    public function test_index_whenNotLoggedIn()
     {
-//        $this->request->setCallable(function ($CI) {
-//            echo 'ble ble ble ble ble ble ble ble';
-//            echo $CI;
-//        });
+        $this->request('GET', 'sales/index');
+        $this->assertRedirect('login');
+    }
+
+    public function test_index_whenLoggedIn()
+    {
+        /*$this->request->setCallable(function () {
+            $auth = $this->getDouble(
+                'Employee', ['is_logged_in' => TRUE]
+            );
+
+            load_class_instance('Employee', $auth);
+        });*/
+
+        MonkeyPatch::patchMethod('Employee', ['is_logged_in' => TRUE, 'has_module_grant' => TRUE]);
 
         $output = $this->request('GET', 'sales/index');
-        var_dump($output);
-        $this->assertContains('OSPOS', $output);
+        $this->assertRedirect('login');
+
+//        $this->assertContains('ble ble ble ble', $output);
     }
 }
