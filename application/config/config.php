@@ -556,3 +556,12 @@ $config['rewrite_short_tags'] = FALSE;
 | Array:		array('10.0.1.200', '192.168.5.0/24')
 */
 $config['proxy_ips'] = '';
+
+
+/*
+| Mpesa configs
+ */
+$config['mpesa_consumer_key'] = 'pNYjx858c5RAEC66U9IksZXmRrNG4Q08';
+$config['mpesa_consumer_secret'] = 'bCbrH7WeAkXhJ5C8';
+$config['mpesa_env'] = 'sandbox';
+$config['mpesa_callback_url'] = $config['base_url'] . '/lnm/payment';

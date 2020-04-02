@@ -1,9 +1,12 @@
 {
-    "name": "john-gachihi/opensourcepos",
-    "require-dev": {
-    },
-    "require": {
-        "phpunit/phpunit": "8.5.2",
-        "kenjis/ci-phpunit-test": "2.x@dev"
-    }
+  "name": "john-gachihi/opensourcepos",
+  "require-dev": {
+  },
+  "require": {
+    "phpunit/phpunit": "8.5.2",
+    "kenjis/ci-phpunit-test": "2.x@dev",
+    "safaricom/mpesa": "^1.0",
+    "ext-curl": "*",
+    "ext-json": "*"
+  }
 }

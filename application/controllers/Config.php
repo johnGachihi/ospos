@@ -837,6 +837,7 @@ class Config extends Secure_Controller
 
 	    if ($success) {
 	        // Register Mpesa c2b callback url
+            $this->mpesaService->registerC2BCallbackUrl($this->input->post('mpesa_till_number'));
         }
 
 	    echo json_encode([
