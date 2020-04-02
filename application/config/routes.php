@@ -85,3 +85,5 @@ $route['reports/specific_supplier'] = 'reports/specific_supplier_input';
 
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
+
+$route['lnm/payment']['POST'] = 'mpesa/payment';

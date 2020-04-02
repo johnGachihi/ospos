@@ -2,7 +2,7 @@
 
 require_once("Secure_Controller.php");
 
-class Mpesa extends Secure_Controller
+class Mpesa extends CI_Controller
 {
     public function __construct()
     {
@@ -10,7 +10,13 @@ class Mpesa extends Secure_Controller
         $this->load->model('mpesaService');
     }
 
-    public function test() {
+    public function payment()
+    {
+        error_log(json_encode($this->input->raw_input_stream));
+    }
+
+    public function test()
+    {
         $this->load->library('form_validation');
 
         $this->form_validation->set_rules(
@@ -24,9 +30,11 @@ class Mpesa extends Secure_Controller
                 'success' => false,
                 'message' => $this->form_validation->error('mpesa_test_phone_number')
             ]);
+        } else {
+            $phoneNumber = $this->input->post('mpesa_test_phone_number');
+            $formattedPhoneNumber = '254' . substr($phoneNumber, 1);
+            $this->mpesaService->simulateC2BPayment($formattedPhoneNumber);
         }
 
-        $this->mpesaService->simulateC2BPayment(
-            $this->input->post('mpesa_test_phone_number'));
     }
 }

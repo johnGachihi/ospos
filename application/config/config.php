@@ -68,6 +68,7 @@ $config['db_log_enabled'] = FALSE;
 $config['base_url'] = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_ENV['FORCE_HTTPS']) && $_ENV['FORCE_HTTPS'] == 'true')) ? 'https' : 'http';
 $config['base_url'] .= '://' . ((isset($_SERVER['HTTP_HOST'])) ? $_SERVER['HTTP_HOST'] : 'localhost') ;
 $config['base_url'] .= str_replace(basename($_SERVER['SCRIPT_NAME']), '', $_SERVER['SCRIPT_NAME']);
+$config['base_url'] = 'https://051b2a63.ngrok.io';
 
 /*
 |--------------------------------------------------------------------------
@@ -487,7 +488,7 @@ $config['csrf_token_name'] = 'csrf_ospos_v3';
 $config['csrf_cookie_name'] = 'csrf_cookie_ospos_v3';
 $config['csrf_expire'] = 7200;
 $config['csrf_regenerate'] = FALSE;
-$config['csrf_exclude_uris'] = array('login');
+$config['csrf_exclude_uris'] = array('login', 'lnm/payment');
 
 /*
 |--------------------------------------------------------------------------
