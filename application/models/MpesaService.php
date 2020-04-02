@@ -14,10 +14,9 @@ class MpesaService extends CI_Model
         $url = $this->getC2BUrlRegistrationEndpointUrl($environment);
 
         $requestHeaders = [
-            'Content-Type:application/json',
-            'Authorization:Bearer ' . $this->generateToken($environment)
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $this->generateToken($environment)
         ];
-
         $requestData = [
             'ValidationURL' => $this->config->item('mpesa_callback_url'),
             'ConfirmationURL' => $this->config->item('mpesa_callback_url'),
@@ -25,9 +24,9 @@ class MpesaService extends CI_Model
             'ShortCode' => $shortCode
         ];
 
-        $curl_response = $this->makeRequest($url, $requestHeaders, true, true, $requestData);
-        error_log(json_encode($curl_response));
-        return json_encode($curl_response);
+        $response = $this->makeRequest($url, $requestHeaders, true, true, $requestData);
+        if (isset($response->errorCode))
+            throw new Exception('Unable to register callback Url');
     }
 
     private function getC2BUrlRegistrationEndpointUrl(string $environment)
@@ -58,6 +57,42 @@ class MpesaService extends CI_Model
         return $response->access_token;
     }
 
+    public function simulateC2BPayment($phoneNumber)
+    {
+        $environment = $this->config->item('mpesa_env');
+        $this->checkEnvironmentValid($environment);
+        $url = $environment === 'live' ?
+            'https://api.safaricom.co.ke/mpesa/c2b/v1/simulate' :
+            'https://sandbox.safaricom.co.ke/mpesa/c2b/v1/simulate';
+
+        $headers = [
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $this->generateToken($environment)
+        ];
+
+        if (!$tillNumber = $this->config->item('mpesa_till_number'))
+            throw new Exception('Mpesa till number not defined');
+
+        $data = [
+            'ShortCode' => $tillNumber,
+            'CommandID' => 'CustomerPayBillOnline',
+            'Amount' => 1,
+            'Msisdn' => $phoneNumber,
+            'BillRefNumber' => 123456
+        ];
+
+        $response = $this->makeRequest($url, $headers, true, true, $data);
+        error_log(json_encode($response));
+    }
+
+
+    function checkEnvironmentValid(string $environment)
+    {
+        if ($environment !== 'live' && $environment !== 'sandbox') {
+            throw new Exception('Invalid Mpesa environment');
+        }
+    }
+
     private function makeRequest(
         string $url,
         array $headers = NULL,
@@ -80,26 +115,6 @@ class MpesaService extends CI_Model
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, $verifyPeer);
 
         return json_decode(curl_exec($curl));
-    }
-
-
-
-
-
-
-
-    function simulateC2BPayment($phoneNumber)
-    {
-        if (!$tillNumber = $this->config->item('mpesa_till_number'))
-            throw new Exception('Mpesa till number not defined');
-
-        \Safaricom\Mpesa\Mpesa::c2b(
-            $tillNumber,
-            'CustomerPayBillOnline',
-            1,
-            $phoneNumber,
-            123456
-        );
     }
 }
 
