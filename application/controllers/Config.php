@@ -829,7 +829,8 @@ class Config extends Secure_Controller
 	public function save_mpesa() {
 	    $input = [
 	        'mpesa_till_number' => $this->input->post('mpesa_till_number'),
-            'mpesa_test_phone_number' => $this->input->post('mpesa_test_phone_number')
+            'mpesa_consumer_key' => $this->input->post('mpesa_consumer_key'),
+            'mpesa_consumer_secret' => $this->input->post('mpesa_consumer_secret')
         ];
 
 	    $result = $this->Appconfig->batch_save($input);
@@ -837,11 +838,15 @@ class Config extends Secure_Controller
 
 	    if ($success) {
             try {
-                $this->mpesaService->registerC2BCallbackUrl($this->input->post('mpesa_till_number'));
+                $this->mpesaService->registerC2BCallbackUrl(
+                    $this->input->post('mpesa_till_number'),
+                    $this->input->post('mpesa_consumer_key'),
+                    $this->input->post('mpesa_consumer_secret')
+                );
             } catch (Exception $e) {
                 echo json_encode([
                     'success' => false,
-                    'message' => 'Unable configure Mpesa till number'
+                    'message' => "Unable to configure Mpesa.\n" . $e->getMessage()
                 ]);
                 return;
             }
