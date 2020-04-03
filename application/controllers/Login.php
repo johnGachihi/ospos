@@ -47,7 +47,9 @@ class Login extends CI_Controller
 		{
 			set_time_limit(1200);
 			// trigger any required upgrade before starting the application
-			$this->migration->latest();
+			if ($this->migration->latest() === FALSE) {
+				show_error($this->migration->error_string());
+			}
 		}
 
 		if(!$this->Employee->login($username, $password))
