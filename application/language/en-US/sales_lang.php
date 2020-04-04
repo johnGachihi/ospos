@@ -89,6 +89,7 @@ $lang["sales_item_name"] = "Item Name";
 $lang["sales_item_number"] = "Item #";
 $lang["sales_item_out_of_stock"] = "Item is out of stock.";
 $lang["sales_mode"] = "Register Mode";
+$lang["sales_mpesa"] = "Mpesa";
 $lang["sales_must_enter_numeric"] = "Amount Tendered must be a number.";
 $lang["sales_must_enter_numeric_giftcard"] = "Gift Card Number must be a number.";
 $lang["sales_new_customer"] = "New Customer";

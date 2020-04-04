@@ -827,8 +827,11 @@ class Config extends Secure_Controller
 	}
 
 	public function save_mpesa() {
-	    $input = [
-	        'mpesa_till_number' => $this->input->post('mpesa_till_number'),
+	    $mpesa_enabled = $this->input->post('mpesa_enable') != NULL;
+
+        $input = [
+            'mpesa_enable' => $mpesa_enabled,
+            'mpesa_till_number' => $this->input->post('mpesa_till_number'),
             'mpesa_consumer_key' => $this->input->post('mpesa_consumer_key'),
             'mpesa_consumer_secret' => $this->input->post('mpesa_consumer_secret')
         ];
@@ -836,7 +839,7 @@ class Config extends Secure_Controller
 	    $result = $this->Appconfig->batch_save($input);
 	    $success = $result ? TRUE : FALSE;
 
-	    if ($success) {
+	    if ($success && $mpesa_enabled) {
             try {
                 $this->mpesaService->registerC2BCallbackUrl(
                     $this->input->post('mpesa_till_number'),

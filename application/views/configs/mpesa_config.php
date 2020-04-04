@@ -5,6 +5,17 @@
         <ul id="mpesa_error_message_box" class="error_message_box"></ul>
 
         <div class="form-group form-group-sm">
+            <?php echo form_label('Enable Mpesa payment', 'mpesa_enable', array('class' => 'control-label col-xs-2')); ?>
+            <div class='col-xs-1'>
+                <?php echo form_checkbox(array(
+                    'name' => 'mpesa_enable',
+                    'value' => 'mpesa_enable',
+                    'id' => 'mpesa_enable',
+                    'checked' => $this->config->item('mpesa_enable')));?>
+            </div>
+        </div>
+
+        <div class="form-group form-group-sm">
             <?php echo form_label($this->lang->line('config_mpesa_till_number'), 'mpesa_till_number', array('class' => 'control-label col-xs-2')); ?>
             <div class='col-xs-2'>
                 <?php echo form_input(array(
@@ -13,6 +24,28 @@
                     'class' => 'form-control input-sm',
                     'value' => $this->config->item('mpesa_till_number'),
                     'placeholder' => 'XXXXXX')); ?>
+            </div>
+        </div>
+
+        <div class="form-group form-group-sm">
+            <?php echo form_label('Mpesa Consumer Key', 'mpesa_consumer_key', array('class' => 'control-label col-xs-2')); ?>
+            <div class='col-xs-2'>
+                <?php echo form_input(array(
+                    'name' => 'mpesa_consumer_key',
+                    'id' => 'mpesa_consumer_key',
+                    'class' => 'form-control input-sm',
+                    'value' => $this->config->item('mpesa_consumer_key'))); ?>
+            </div>
+        </div>
+
+        <div class="form-group form-group-sm">
+            <?php echo form_label('Mpesa Consumer Secret', 'mpesa_consumer_secret', ['class' => 'control-label col-xs-2']); ?>
+            <div class="col-xs-2">
+                <?php echo form_input([
+                    'name' => 'mpesa_consumer_secret',
+                    'id' => 'mpesa_consumer_secret',
+                    'class' => 'form-control input-sm',
+                    'value' => $this->config->item('mpesa_consumer_secret')]); ?>
             </div>
         </div>
 
@@ -52,7 +85,23 @@
 
 
 <script>
-    $(document).ready(() => {
+    $(document).on('ready', () => {
+        /*if ($('#mpesa_enable').is(':checked'))
+            mpesaConfigFormInputsBesidesMpesaEnableAndSubmitEnabled(true);
+        else
+            mpesaConfigFormInputsBesidesMpesaEnableAndSubmitEnabled(false);
+
+        $('#mpesa_enable').on('change', function(e) {
+            const mpesaEnabled = $(this).is(':checked');
+            mpesaConfigFormInputsBesidesMpesaEnableAndSubmitEnabled(mpesaEnabled)
+        });
+
+        function mpesaConfigFormInputsBesidesMpesaEnableAndSubmitEnabled(enabled) {
+            $('#mpesa_config_form')
+                .find(`input:not(#mpesa_enable, input[type="submit"], input[name="csrf_ospos_v3"])`)
+                .prop('disabled', !enabled)
+        }*/
+
         $.validator.addMethod(
             'regex',
             function (input, inputEl, pattern) {
@@ -78,7 +127,7 @@
             }
         }));
 
-        $('#mpesa_test_form').validate($.extend(form_support.handler, {
+        $('#mpesa_test_form').validate({
             errorLabelContainer: '#mpesa_test_error_message_box',
             rules: {
                 mpesa_test_phone_number: {
@@ -91,7 +140,15 @@
                     required: "<?php echo $this->lang->line('config_mpesa_test_phone_number_required'); ?>",
                     regex: "The phone number provided is invalid"
                 }
+            },
+            submitHandler: form => {
+                $(form).ajaxSubmit({
+                    success: res => {
+                        $.notify(res.message, { type: res.success ? 'success' : 'danger' });
+                    },
+                    dataType: 'json'
+                })
             }
-        }))
+        })
     });
 </script>

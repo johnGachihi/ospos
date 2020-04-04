@@ -7,6 +7,7 @@
     "kenjis/ci-phpunit-test": "2.x@dev",
     "safaricom/mpesa": "^1.0",
     "ext-curl": "*",
-    "ext-json": "*"
+    "ext-json": "*",
+    "ext-bcmath": "*"
   }
 }
