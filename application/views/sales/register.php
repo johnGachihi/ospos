@@ -486,6 +486,12 @@ if (isset($success)) {
                     </table>
                     <?php echo form_close(); ?>
 
+                    <div class='btn btn-sm btn-primary pull-right d-none' id='listen-for-mpesa-payment'
+                         tabindex="<?php echo ++$tabindex ?>" style="display: none">
+                        <span class="glyphicon glyphicon-earphone">&nbsp;</span>
+                        <?php echo $this->lang->line('sales_listen_mpesa'); ?>
+                    </div>
+
                     <div class='btn btn-sm btn-success pull-right' id='add_payment_button'
                          tabindex="<?php echo ++$tabindex; ?>"><span
                                 class="glyphicon glyphicon-credit-card">&nbsp</span><?php echo $this->lang->line('sales_add_payment'); ?>
@@ -626,6 +632,108 @@ if (isset($success)) {
             <?php
         }
         ?>
+    </div>
+</div>
+
+<div id="mpesa-payments-modal" class="modal bootstrap-dialog modal-dlg-wide type-primary fade size-normal in" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="bootstrap-dialog-header">
+                    <div class="bootstrap-dialog-close-button" data-dismiss="modal" >
+                        <span class="close" aria-label="Close" aria-hidden="true">&times;</span>
+                    </div>
+                    <h4 class="bootstrap-dialog-title">Mpesa Payments</h4>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="search-bar" style="display: flex; justify-content: space-between;
+                 border-bottom: 1px solid #ececec; padding-bottom: 10px;">
+                    <div>
+                        <div class="nav navbar-nav" style="display: flex;">
+                            <div style="margin-right: 5px; margin-top: auto; margin-bottom: auto">
+                                <div class="dropdown">
+                                    <a class="dropdown-toggle text-primary" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true">
+                                        <span id="mpesa-payment-search-parameter">Amount</span>
+                                        <span class="caret"></span>
+                                    </a>
+                                    <ul id="mpesa-payment-search-parameters" class="dropdown-menu" aria-labelledby="dLabel">
+                                        <li><a id="amount" href="#">Amount</a></li>
+                                        <li><a id="transaction-id" href="#">Transaction ID</a></li>
+                                        <li><a id="phone-number" href="#">Phone Number</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="form-group form-group-sm" style="margin-bottom: 0; margin-right: 10px">
+                                <input id="mpesa-payment-search-query" class="form-control">
+                            </div>
+                            <div class="form-group form-group-sm" style="margin-bottom: 0">
+                                <button class="btn btn-primary form-control">Listen</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <img src="http://ospos.local/images/spinner.gif" alt="Loading..." width="35px">
+                </div>
+
+                <div style="margin-top: 20px">
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            <div>
+                                <table class="mpesa-payment-details">
+                                    <tr>
+                                        <td>Transaction ID:</td>
+                                        <td>OC38WT312</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Name:</td>
+                                        <td>John Doe Doughnut</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Amount:</td>
+                                        <td>Kshs. 100</td>
+                                    </tr>
+                                </table>
+                                <div style="display: flex; justify-content: flex-end;">
+                                    <div class='btn btn-sm btn-success' id='add_payment_button'>
+                                        <span class="glyphicon glyphicon-credit-card">&nbsp</span>
+                                        <?php echo $this->lang->line('sales_add_payment'); ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <div>
+                                <table class="mpesa-payment-details">
+                                    <tr>
+                                        <td>Transaction ID:</td>
+                                        <td>OC38WT312</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Name:</td>
+                                        <td>John Doe Doughnut</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Amount:</td>
+                                        <td>Kshs. 100</td>
+                                    </tr>
+                                </table>
+                                <div style="display: flex; justify-content: flex-end;">
+                                    <div class='btn btn-sm btn-success' id='add_payment_button'>
+                                        <span class="glyphicon glyphicon-credit-card">&nbsp</span>
+                                        <?php echo $this->lang->line('sales_add_payment'); ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!--<div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>-->
+        </div>
     </div>
 </div>
 
@@ -887,7 +995,71 @@ if (isset($success)) {
             $(".giftcard-input").attr('disabled', true);
             $(".non-giftcard-input").attr('disabled', false);
         }
+
+        if ($('#payment_types').val() === "<?php echo $this->lang->line('sales_mpesa'); ?>") {
+            $('#listen-for-mpesa-payment').css('display', 'block');
+            $('#add_payment_button').css('display', 'none');
+            $('#mpesa-payments-modal').modal();
+        } else {
+            $('#listen-for-mpesa-payment').css('display', 'none');
+            $('#add_payment_button').css('display', 'block');
+        }
     }
+
+    $('#listen-for-mpesa-payment').on('click', () => {
+        $('#mpesa-payments-modal').modal();
+    });
+
+
+    /**
+     * Mpesa modal setup
+     */
+
+    // On modal start-up
+    $('#mpesa-payments-modal').on('show.bs.modal', function (e) {
+        // Search for mpesa payment with similar amount as amount tendered
+        const amountTendered = $('#amount_tendered').val();
+        $(this).find('#mpesa-payment-search-query').val(amountTendered);
+        $(this).find('#mpesa-payment-search-parameter').text('Amount');
+        searchForMpesaPayment('amount', amountTendered);
+    });
+
+    $('#mpesa-payments-modal').on('hide.bs.modal', e => {
+        stopSearchForMpesaPayment();
+    });
+
+    // Mpesa payment query options setup
+    $('#mpesa-payment-search-parameters > li > a').on('click', e => {
+        const searchParam = $(e.currentTarget).text();
+        $('#mpesa-payment-search-parameter').text(searchParam);
+
+        e.preventDefault();
+    });
+
+    let intervalID;
+
+    function searchForMpesaPayment(searchParam, searchQuery) {
+        stopSearchForMpesaPayment();
+
+        intervalID = setInterval(makeSearchRequest, 5000);
+
+        function makeSearchRequest() {
+            $.ajax({
+                url: "<?php echo site_url('mpesa/search_payments');?>",
+                data: {
+                    searchParam,
+                    searchQuery
+                },
+                dataType: 'json'
+            })
+        }
+    }
+
+    function stopSearchForMpesaPayment() {
+        if (!!intervalID)
+            clearInterval(intervalID);
+    }
+
 </script>
 
 <?php $this->load->view("partial/footer"); ?>

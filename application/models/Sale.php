@@ -971,9 +971,12 @@ class Sale extends CI_Model
 	/**
 	 * Gets sale payment options
 	 */
-	public function get_payment_options($giftcard = TRUE, $reward_points = FALSE)
+	public function get_payment_options($giftcard = TRUE, $reward_points = FALSE, $mpesa = TRUE)
 	{
 		$payments = get_payment_options();
+
+		if ($mpesa)
+			$payments[$this->lang->line('sales_mpesa')] = $this->lang->line('sales_mpesa');
 
 		if($giftcard == TRUE)
 		{
