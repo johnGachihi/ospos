@@ -667,7 +667,7 @@ if (isset($success)) {
                             <div class="form-group form-group-sm" style="margin-bottom: 0; margin-right: 10px">
                                 <input id="mpesa-payment-search-query" class="form-control">
                             </div>
-                            <div class="form-group form-group-sm" style="margin-bottom: 0">
+                            <div id="search-mpesa-payment" class="form-group form-group-sm" style="margin-bottom: 0">
                                 <button class="btn btn-primary form-control">Listen</button>
                             </div>
                         </div>
@@ -1018,7 +1018,7 @@ if (isset($success)) {
     // On modal start-up
     $('#mpesa-payments-modal').on('show.bs.modal', function (e) {
         // Search for mpesa payment with similar amount as amount tendered
-        const amountTendered = $('#amount_tendered').val();
+        const amountTendered = '<?php echo $cash_amount_due ?>';
         $(this).find('#mpesa-payment-search-query').val(amountTendered);
         $(this).find('#mpesa-payment-search-parameter').text('Amount');
         searchForMpesaPayment('amount', amountTendered);
@@ -1036,6 +1036,25 @@ if (isset($success)) {
         e.preventDefault();
     });
 
+    $('#search-mpesa-payment').on('click', e => {
+        const searchParam = mapTextToSearchParam($('#mpesa-payment-search-parameter').text());
+        const searchQuery = $('#mpesa-payment-search-query').val();
+        searchForMpesaPayment(searchParam, searchQuery);
+    });
+
+    function mapTextToSearchParam(text) {
+        switch (text) {
+            case 'Amount':
+                return 'amount';
+            case 'Transaction ID':
+                return 'transaction_id';
+            case 'Phone Number':
+                return 'phone_number';
+            default:
+                return text.toLowerCase();
+        }
+    }
+
     let intervalID;
 
     function searchForMpesaPayment(searchParam, searchQuery) {
@@ -1046,9 +1065,11 @@ if (isset($success)) {
         function makeSearchRequest() {
             $.ajax({
                 url: "<?php echo site_url('mpesa/search_payments');?>",
+                method: 'post',
                 data: {
-                    searchParam,
-                    searchQuery
+                    search_param: searchParam,
+                    search_query: searchQuery,
+                    csrf_ospos_v3: csrf_token()
                 },
                 dataType: 'json'
             })

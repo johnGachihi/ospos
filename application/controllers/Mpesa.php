@@ -14,7 +14,7 @@ class Mpesa extends CI_Controller
     public function payment()
     {
         error_log(json_encode($this->input->raw_input_stream));
-        if (! $this->checkPaymentRequestValid($this->input->raw_input_stream)) {
+        if (!$this->checkPaymentRequestValid($this->input->raw_input_stream)) {
             echo json_encode([
                 "ResponseCode" => "1",
                 "ResponseDesc" => "Invalid Request Body"
@@ -41,10 +41,8 @@ class Mpesa extends CI_Controller
 
     private function checkPaymentRequestValid($responseBody)
     {
-        if (! $jsonResponseBody = json_decode($responseBody))
+        if (!$jsonResponseBody = json_decode($responseBody))
             return false;
-
-//        show_error($jsonResponseBody->TransId);
 
         return isset($jsonResponseBody->TransID) &&
             isset($jsonResponseBody->TransAmount) &&
@@ -52,6 +50,40 @@ class Mpesa extends CI_Controller
             isset($jsonResponseBody->FirstName) &&
             isset($jsonResponseBody->MiddleName) &&
             isset($jsonResponseBody->LastName);
+    }
+
+    public function search_payments()
+    {
+        $this->form_validation->set_rules('search_param', 'Search parameter',
+            'required|in_list[amount,transaction_id,phone_number]');
+
+        $this->form_validation->set_rules('search_query', 'Search query', 'required');
+
+        if ($this->form_validation->run()) {
+            $search_param = null;
+            switch ($this->input->post('search_param')) {
+                case 'amount':
+                    $search_param = new AMOUNT();
+                    break;
+                case 'transaction_id':
+                    $search_param = new TRANSACTION_ID();
+                    break;
+                default:
+                    $search_param = new PHONE_NUMBER();
+            }
+            $payments = $this->mpesa_model->search_payments(
+                $search_param, $this->input->post('search_query'));
+
+            echo json_encode([
+                'success' => true,
+                'payments' => $payments
+            ]);
+        } else {
+            echo json_encode([
+                'success' => false,
+                'message' => $this->form_validation->error_string()
+            ]);
+        }
     }
 
     public function test()
