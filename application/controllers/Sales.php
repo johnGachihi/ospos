@@ -12,6 +12,8 @@ class Sales extends Secure_Controller
 	{
 		parent::__construct('sales');
 
+		$this->load->model('mpesa_model');
+
 		$this->load->library('sale_lib');
 		$this->load->library('barcode_lib');
 		$this->load->library('email_lib');
@@ -273,13 +275,17 @@ class Sales extends Secure_Controller
 		$data = array();
 
 		$payment_type = $this->input->post('payment_type');
-		if($payment_type != $this->lang->line('sales_giftcard'))
+		if ($payment_type == $this->lang->line('sales_giftcard'))
 		{
-			$this->form_validation->set_rules('amount_tendered', 'lang:sales_amount_tendered', 'trim|required|callback_numeric');
+			$this->form_validation->set_rules('amount_tendered', 'lang:sales_amount_tendered', 'trim|required');
+		}
+		elseif ($payment_type == $this->lang->line('sales_mpesa'))
+		{
+			$this->form_validation->set_rules('mpesa_transaction_id', 'Mpesa Transaction Id', 'required');
 		}
 		else
 		{
-			$this->form_validation->set_rules('amount_tendered', 'lang:sales_amount_tendered', 'trim|required');
+			$this->form_validation->set_rules('amount_tendered', 'lang:sales_amount_tendered', 'trim|required|callback_numeric');
 		}
 
 		if($this->form_validation->run() == FALSE)
@@ -287,6 +293,10 @@ class Sales extends Secure_Controller
 			if($payment_type == $this->lang->line('sales_giftcard'))
 			{
 				$data['error'] = $this->lang->line('sales_must_enter_numeric_giftcard');
+			}
+			elseif ($payment_type == $this->lang->line('sales_mpesa'))
+			{
+				$data['error'] = $this->form_validation->error('mpesa_transaction_id');
 			}
 			else
 			{
@@ -358,6 +368,10 @@ class Sales extends Secure_Controller
 					}
 				}
 			}
+			elseif ($payment_type == $this->lang->line('sales_mpesa')){
+				$error =  $this->add_mpesa_payment($this->input->post('mpesa_transaction_id'));
+				if ($error) $data['error'] = $error;
+			}
 			else
 			{
 				$amount_tendered = $this->input->post('amount_tendered');
@@ -366,6 +380,17 @@ class Sales extends Secure_Controller
 		}
 
 		$this->_reload($data);
+	}
+
+	private function add_mpesa_payment($transaction_id)
+	{
+		$paymentType = 'Mpesa';
+		try {
+			$amountTendered = $this->mpesa_model->getPayment($transaction_id)->amount;
+			$this->sale_lib->add_payment($paymentType, $amountTendered);
+		} catch (Exception $e) {
+			return $e->getMessage();
+		}
 	}
 
 	// Multiple Payments

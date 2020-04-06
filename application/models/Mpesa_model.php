@@ -12,7 +12,7 @@ class Mpesa_model extends CI_Model
         $column = $this->getDatabaseColumn($search_param);
         $this->db->where($column, $search_query);
         $this->db->where('status', 'pending');
-        $this->db->where('created_at > DATE_SUB(NOW(), INTERVAL 30 MINUTE)');
+        $this->db->where('created_at > DATE_SUB(NOW(), INTERVAL 6 HOUR)'); // should be 10 MINUTE or less
         $query = $this->db->get('mpesa_payments');
         return $query->result();
     }
@@ -28,6 +28,33 @@ class Mpesa_model extends CI_Model
             default:
                 throw new InvalidArgumentException('Invalid SearchParam provided');
         }
+    }
+
+    public function getPayment($transactionId)
+    {
+        $this->db->where('transaction_id', $transactionId);
+        $query = $this->db->get('mpesa_payments');
+        $result = $query->result();
+
+        if (count($result) < 1)
+            throw new Exception('No mpesa transaction with matching transaction id found');
+
+        if (count($result) > 1)
+            log_message('error', 'There exists Mpesa payments with similar `transaction_id`s');
+
+        if ($result[0]->status !== 'pending') {
+            log_message('error', 'Non-pending mpesa payment submitted for re-use');
+            throw new Exception('No unused mpesa transaction with matching transaction id found');
+        }
+
+        return $result[0];
+    }
+
+    public function markPaymentAsUsed($transactionId)
+    {
+        $query = $this->db->update_string('mpesa_payments', ['status' => 'used'], "transaction_id = $transactionId");
+        if (! $query)
+            throw new Exception('Unable to edit Mpesa payment');
     }
 }
 

@@ -8,6 +8,7 @@
     "safaricom/mpesa": "^1.0",
     "ext-curl": "*",
     "ext-json": "*",
-    "ext-bcmath": "*"
+    "ext-bcmath": "*",
+    "ext-intl": "*"
   }
 }

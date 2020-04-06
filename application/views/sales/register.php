@@ -439,6 +439,7 @@ if (isset($success)) {
                             </td>
                         </tr>
                     </table>
+
                     <?php echo form_close(); ?>
                     <?php
                     $payment_type = $this->input->post('payment_type');
@@ -484,6 +485,8 @@ if (isset($success)) {
                             </td>
                         </tr>
                     </table>
+                    <input id="mpesa-transaction-id" name="mpesa_transaction_id" type="hidden">
+
                     <?php echo form_close(); ?>
 
                     <div class='btn btn-sm btn-primary pull-right d-none' id='listen-for-mpesa-payment'
@@ -647,10 +650,10 @@ if (isset($success)) {
                 </div>
             </div>
             <div class="modal-body">
-                <div class="search-bar" style="display: flex; justify-content: space-between;
+                <!--<div class="search-bar" style="display: flex; justify-content: space-between;
                  border-bottom: 1px solid #ececec; padding-bottom: 10px;">
                     <div>
-                        <div class="nav navbar-nav" style="display: flex;">
+                        <div style="display: flex;">
                             <div style="margin-right: 5px; margin-top: auto; margin-bottom: auto">
                                 <div class="dropdown">
                                     <a class="dropdown-toggle text-primary" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true">
@@ -671,68 +674,50 @@ if (isset($success)) {
                                 <button class="btn btn-primary form-control">Listen</button>
                             </div>
                         </div>
+
+                        <div id="mpesa-search-query-validation-error"
+                             style="position: relative; left: 68px; display: none; color: red"></div>
                     </div>
 
-                    <img src="http://ospos.local/images/spinner.gif" alt="Loading..." width="35px">
+                    <img src="http://ospos.local/images/spinner.gif" alt="Loading..." width="35px" style="align-self: flex-start; object-fit: contain">
+                </div>-->
+
+                <div class="search-bar" style="display: flex; justify-content: space-between;
+                 border-bottom: 1px solid #ececec; padding-bottom: 10px;">
+                    <div>
+                        <div style="display: grid; grid-auto-columns: max-content">
+                            <div style="margin-right: 5px; margin-top: auto; margin-bottom: auto; grid-column: 1; grid-row: 1">
+                                <div class="dropdown">
+                                    <a class="dropdown-toggle text-primary" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true">
+                                        <span id="mpesa-payment-search-parameter">Amount</span>
+                                        <span class="caret"></span>
+                                    </a>
+                                    <ul id="mpesa-payment-search-parameters" class="dropdown-menu" aria-labelledby="dLabel">
+                                        <li><a id="amount" href="#">Amount</a></li>
+                                        <li><a id="transaction-id" href="#">Transaction ID</a></li>
+                                        <li><a id="phone-number" href="#">Phone Number</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="form-group form-group-sm" style="margin-bottom: 0; margin-right: 10px; grid-column: 2; grid-row: 1">
+                                <input id="mpesa-payment-search-query" class="form-control">
+                            </div>
+                            <div id="search-mpesa-payment" class="form-group form-group-sm" style="margin-bottom: 0; grid-column: 3; grid-row: 1">
+                                <button class="btn btn-primary form-control">Listen</button>
+                            </div>
+
+                            <div id="mpesa-search-query-validation-error" style="color: red; grid-column: 2 / span 2; grid-row: 2">
+                            </div>
+                        </div>
+                    </div>
+
+                    <img src="http://ospos.local/images/spinner.gif" alt="Loading..." width="35px" style="align-self: flex-start; object-fit: contain">
                 </div>
 
-                <div style="margin-top: 20px">
-                    <ul class="list-group">
-                        <li class="list-group-item">
-                            <div>
-                                <table class="mpesa-payment-details">
-                                    <tr>
-                                        <td>Transaction ID:</td>
-                                        <td>OC38WT312</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Name:</td>
-                                        <td>John Doe Doughnut</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Amount:</td>
-                                        <td>Kshs. 100</td>
-                                    </tr>
-                                </table>
-                                <div style="display: flex; justify-content: flex-end;">
-                                    <div class='btn btn-sm btn-success' id='add_payment_button'>
-                                        <span class="glyphicon glyphicon-credit-card">&nbsp</span>
-                                        <?php echo $this->lang->line('sales_add_payment'); ?>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="list-group-item">
-                            <div>
-                                <table class="mpesa-payment-details">
-                                    <tr>
-                                        <td>Transaction ID:</td>
-                                        <td>OC38WT312</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Name:</td>
-                                        <td>John Doe Doughnut</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Amount:</td>
-                                        <td>Kshs. 100</td>
-                                    </tr>
-                                </table>
-                                <div style="display: flex; justify-content: flex-end;">
-                                    <div class='btn btn-sm btn-success' id='add_payment_button'>
-                                        <span class="glyphicon glyphicon-credit-card">&nbsp</span>
-                                        <?php echo $this->lang->line('sales_add_payment'); ?>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
+                <div style="margin-top: 20px; min-height: 40px">
+                    <ul id="mpesa-payments-container" class="list-group"></ul>
                 </div>
             </div>
-            <!--<div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
-            </div>-->
         </div>
     </div>
 </div>
@@ -1017,15 +1002,15 @@ if (isset($success)) {
 
     // On modal start-up
     $('#mpesa-payments-modal').on('show.bs.modal', function (e) {
-        // Search for mpesa payment with similar amount as amount tendered
-        const amountTendered = '<?php echo $cash_amount_due ?>';
+        const amountTendered = '<?php echo $non_cash_amount_due ?>';
         $(this).find('#mpesa-payment-search-query').val(amountTendered);
         $(this).find('#mpesa-payment-search-parameter').text('Amount');
         searchForMpesaPayment('amount', amountTendered);
     });
 
+    // On modal close
     $('#mpesa-payments-modal').on('hide.bs.modal', e => {
-        stopSearchForMpesaPayment();
+        stopOngoingSearchForMpesaPayment();
     });
 
     // Mpesa payment query options setup
@@ -1036,11 +1021,67 @@ if (isset($success)) {
         e.preventDefault();
     });
 
+    const SearchParam = {
+        AMOUNT: 'amount',
+        TRANSACTION_ID: 'transaction_id',
+        PHONE_NUMBER: 'phone_number',
+    };
+
     $('#search-mpesa-payment').on('click', e => {
         const searchParam = mapTextToSearchParam($('#mpesa-payment-search-parameter').text());
         const searchQuery = $('#mpesa-payment-search-query').val();
-        searchForMpesaPayment(searchParam, searchQuery);
+        validateSearchQuery({searchParam, searchQuery,
+            onValidated: () => searchForMpesaPayment(searchParam, searchQuery)});
     });
+
+    const $error = $('#mpesa-search-query-validation-error');
+
+    function validateSearchQuery(props = {}) {
+        hideSearchQueryError();
+
+        const {searchParam, searchQuery, onValidated} = props;
+        let isValid = true;
+
+        if (searchParam === SearchParam.AMOUNT) {
+            isValid = !isNaN(searchQuery);
+        } else if (searchParam === SearchParam.PHONE_NUMBER) {
+            isValid = checkPhoneNumberValidity(searchQuery);
+        } else if (searchParam === SearchParam.TRANSACTION_ID) {
+            isValid = searchQuery.length === 10
+        }
+
+        if (isValid)
+            onValidated(searchParam, searchQuery);
+        else
+            showSearchQueryError();
+
+        function showSearchQueryError() {
+            $error.text(`Invalid ${searchParam} provided`);
+            $error.css('display', 'block');
+        }
+
+        function hideSearchQueryError() {
+            $error.text('');
+            $error.css('display', 'none');
+        }
+    }
+
+    function checkPhoneNumberValidity(phoneNumber) {
+        const charLength = phoneNumber.length;
+        const firstChar = phoneNumber[0];
+
+        console.log(charLength, firstChar);
+
+        if (firstChar !== '0' && firstChar !== '2')
+            return false;
+
+        if (firstChar === '0' && charLength !== 10)
+            return false;
+        else if (firstChar === '2' && charLength !== 12)
+            return false;
+
+        return true;
+    }
 
     function mapTextToSearchParam(text) {
         switch (text) {
@@ -1056,10 +1097,13 @@ if (isset($success)) {
     }
 
     let intervalID;
+    const allPaymentsTransactionIDs = new Set();
 
     function searchForMpesaPayment(searchParam, searchQuery) {
-        stopSearchForMpesaPayment();
+        stopOngoingSearchForMpesaPayment();
+        clearPreviousSearchResults();
 
+        makeSearchRequest();
         intervalID = setInterval(makeSearchRequest, 5000);
 
         function makeSearchRequest() {
@@ -1071,15 +1115,67 @@ if (isset($success)) {
                     search_query: searchQuery,
                     csrf_ospos_v3: csrf_token()
                 },
-                dataType: 'json'
+                dataType: 'json',
+                success: data => {
+                    if (data.success) appendPaymentsToModal(data.payments)
+                }
             })
         }
     }
 
-    function stopSearchForMpesaPayment() {
+    function appendPaymentsToModal(receivedPayments) {
+        for (const payment of receivedPayments) {
+            if (! allPaymentsTransactionIDs.has(payment.transaction_id)) {
+                allPaymentsTransactionIDs.add(payment.transaction_id);
+                appendPaymentToModal(payment)
+            }
+        }
+    }
+
+    function appendPaymentToModal(payment) {
+        $('#mpesa-payments-container').append(`
+            <li class="list-group-item">
+                <div>
+                    <table class="mpesa-payment-details">
+                        <tr>
+                            <td>Transaction ID:</td>
+                            <td>${payment.transaction_id}</td>
+                        </tr>
+                        <tr>
+                            <td>Name:</td>
+                            <td>${payment.payer_first_name} ${payment.payer_middle_name} ${payment.payer_last_name}</td>
+                        </tr>
+                        <tr>
+                            <td>Amount:</td>
+                            <td>Kshs. ${payment.amount}</td>
+                        </tr>
+                    </table>
+                    <div style="display: flex; justify-content: flex-end;">
+                        <div class='btn btn-sm btn-success add-mpesa-payment' data-transaction-id='${payment.transaction_id}'>
+                            <span class="glyphicon glyphicon-credit-card">&nbsp</span>
+                            <?php echo $this->lang->line('sales_add_payment'); ?>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        `);
+    }
+
+    function stopOngoingSearchForMpesaPayment() {
         if (!!intervalID)
             clearInterval(intervalID);
     }
+
+    function clearPreviousSearchResults() {
+        $('#mpesa-payments-container').html('');
+        allPaymentsTransactionIDs.clear();
+    }
+
+    $(document).on('click', '.add-mpesa-payment', e => {
+        // console.log($(e.currentTarget).data('transactionId'));
+        $('#mpesa-transaction-id').val($(e.currentTarget).data('transactionId'));
+        $('#add_payment_form').trigger('submit');
+    });
 
 </script>
 
