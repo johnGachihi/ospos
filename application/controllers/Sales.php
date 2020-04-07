@@ -369,8 +369,13 @@ class Sales extends Secure_Controller
 				}
 			}
 			elseif ($payment_type == $this->lang->line('sales_mpesa')){
-				$error =  $this->add_mpesa_payment($this->input->post('mpesa_transaction_id'));
-				if ($error) $data['error'] = $error;
+				try {
+					$this->add_mpesa_payment($this->input->post('mpesa_transaction_id'));
+				} catch (Exception $e) {
+					$error = 'Unable to add Mpesa payment. ' . $e->getMessage();
+					$data['error'] = $error;
+					log_message('error', $error);
+				}
 			}
 			else
 			{
@@ -387,9 +392,10 @@ class Sales extends Secure_Controller
 		$paymentType = 'Mpesa';
 		try {
 			$amountTendered = $this->mpesa_model->getPayment($transaction_id)->amount;
+			$this->mpesa_model->markPaymentAsUsed($transaction_id);
 			$this->sale_lib->add_payment($paymentType, $amountTendered);
 		} catch (Exception $e) {
-			return $e->getMessage();
+			throw $e;
 		}
 	}
 

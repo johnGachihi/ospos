@@ -52,7 +52,8 @@ class Mpesa_model extends CI_Model
 
     public function markPaymentAsUsed($transactionId)
     {
-        $query = $this->db->update_string('mpesa_payments', ['status' => 'used'], "transaction_id = $transactionId");
+        $str = $this->db->update_string('mpesa_payments', ['status' => 'used'], "transaction_id = '$transactionId'");
+        $query = $this->db->query($str);
         if (! $query)
             throw new Exception('Unable to edit Mpesa payment');
     }
