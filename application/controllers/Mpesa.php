@@ -29,14 +29,18 @@ class Mpesa extends CI_Controller
 
         $response = json_decode($this->input->raw_input_stream);
 
-        $this->mpesa_model->savePayment([
-            'transaction_id' => $response->TransID,
-            'amount' => $response->TransAmount,
-            'payer_phone_number' => $response->MSISDN,
-            'payer_first_name' => $response->FirstName,
-            'payer_middle_name' => $response->MiddleName,
-            'payer_last_name' => $response->LastName
-        ]);
+        try {
+            $this->mpesa_model->savePayment([
+                'transaction_id' => $response->TransID,
+                'amount' => $response->TransAmount,
+                'payer_phone_number' => $response->MSISDN,
+                'payer_first_name' => $response->FirstName,
+                'payer_middle_name' => $response->MiddleName,
+                'payer_last_name' => $response->LastName
+            ]);
+        } catch (Exception $e) {
+            log_message('error', 'Error saving mpesa payment. ' . $e->getMessage());
+        }
     }
 
     private function checkPaymentRequestValid($responseBody)
@@ -57,20 +61,23 @@ class Mpesa extends CI_Controller
         $this->form_validation->set_rules('search_param', 'Search parameter',
             'required|in_list[amount,transaction_id,phone_number]');
 
-        $this->form_validation->set_rules('search_query', 'Search query', 'required');
+        switch ($this->input->post('search_param')) {
+            case 'amount':
+                $searchParamRules = 'numeric';
+                break;
+            case 'transaction_id':
+                $searchParamRules = 'alpha_numeric|exact_length[10]';
+                break;
+            case 'phone_number':
+                $searchParamRules = 'callback_phone_number|callback_format_phone_number';
+                break;
+            default:
+                $searchParamRules = '';
+        }
+        $this->form_validation->set_rules('search_query', 'Search query', 'required|' . $searchParamRules);
 
         if ($this->form_validation->run()) {
-            $search_param = null;
-            switch ($this->input->post('search_param')) {
-                case 'amount':
-                    $search_param = new AMOUNT();
-                    break;
-                case 'transaction_id':
-                    $search_param = new TRANSACTION_ID();
-                    break;
-                default:
-                    $search_param = new PHONE_NUMBER();
-            }
+            $search_param = $this->getSearchParam($this->input->post('search_param'));
             $payments = $this->mpesa_model->search_payments(
                 $search_param, $this->input->post('search_query'));
 
@@ -83,6 +90,35 @@ class Mpesa extends CI_Controller
                 'success' => false,
                 'message' => $this->form_validation->error_string()
             ]);
+        }
+    }
+
+    function phone_number($input): bool
+    {
+        if (strlen($input) === 10)
+            return $input[0] === '0';
+        elseif (strlen($input) === 12)
+            return $input[0] === '2';
+        else
+            return false;
+    }
+
+    function format_phone_number($phoneNumber): string {
+        if ($phoneNumber[0] === '0')
+            return '254' . substr($phoneNumber, 1);
+        else
+            return $phoneNumber;
+    }
+
+    function getSearchParam($input): SearchParam
+    {
+        switch ($input) {
+            case 'amount':
+                return new AMOUNT();
+            case 'transaction_id':
+                return new TRANSACTION_ID();
+            default:
+                return new PHONE_NUMBER();
         }
     }
 

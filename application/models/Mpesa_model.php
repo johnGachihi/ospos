@@ -4,7 +4,8 @@ class Mpesa_model extends CI_Model
 {
     public function savePayment(array $payment)
     {
-        $this->db->insert('mpesa_payments', $payment);
+        if (! $this->db->insert('mpesa_payments', $payment))
+            throw new Exception($this->db->error()['message']);
     }
 
     public function search_payments(SearchParam $search_param, string $search_query): array
@@ -39,8 +40,10 @@ class Mpesa_model extends CI_Model
         if (count($result) < 1)
             throw new Exception('No mpesa transaction with matching transaction id found');
 
-        if (count($result) > 1)
+        if (count($result) > 1) {
             log_message('error', 'There exists Mpesa payments with similar `transaction_id`s');
+            throw new Exception('There exists Mpesa payments with similar `transaction_id`s');
+        }
 
         if ($result[0]->status !== 'pending') {
             log_message('error', 'Non-pending mpesa payment submitted for re-use');
