@@ -41,7 +41,7 @@
         <div class="form-group form-group-sm">
             <?php echo form_label('Mpesa Consumer Secret', 'mpesa_consumer_secret', ['class' => 'control-label col-xs-2']); ?>
             <div class="col-xs-2">
-                <?php echo form_input([
+                <?php echo form_password([
                     'name' => 'mpesa_consumer_secret',
                     'id' => 'mpesa_consumer_secret',
                     'class' => 'form-control input-sm',
@@ -59,7 +59,7 @@
 </div>
 <?php echo form_close(); ?>
 
-<?php echo form_open('mpesa/test/', array('id' => 'mpesa_test_form', 'enctype' => 'multipart/form-data', 'class' => 'form-horizontal')); ?>
+<?php echo form_open('mpesa/test/', array('id' => 'mpesa_test_form', 'enctype' => 'multipart/form-data', 'class' => 'form-horizontal', 'style' => 'display: none;')); ?>
 <hr style="margin: 40px 0 5px 0">
 <div class="text-center">Test Mpesa integration</div>
 <ul id="mpesa_test_error_message_box" class="error_message_box"></ul>
