@@ -181,7 +181,7 @@ $lang["config_mpesa_configuration"] = "Mpesa Configuration and Testing";
 $lang["config_mpesa_till_number"] = "Mpesa till number";
 $lang["config_mpesa_test_phone_number"] = "Phone number for test";
 $lang["config_mpesa_till_number_required"] = "The Mpesa till number is required";
-$lang["config_mpesa_till_number_invalid"] = "The Mpesa till number provided is invalid. It should be a six digit number.";
+$lang["config_mpesa_till_number_invalid"] = "The Mpesa till number provided is invalid. It should have 5-6 digits.";
 $lang["config_mpesa_test_phone_number_required"] = "The phone number for the test is required";
 
 $lang["config_msg_msg"] = "Saved Text Message";

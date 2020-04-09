@@ -116,7 +116,7 @@
             rules: {
                 mpesa_till_number: {
                     required: true,
-                    regex: '^[0-9]{6}$'
+                    regex: '^[0-9]{5,6}$'
                 }
             },
             messages: {
